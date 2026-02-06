@@ -43,9 +43,9 @@ LevelManager
 
 - Gridmap.
 
-- Placering af flag og vægge/blocks i grids fra spiller.
+- Placering af flag og vægge/blocks i grids af spiller.
 
-- Shop med Upgrades/Powerups (flere vægge/Forskellige slags vægge, større map og andre positives for spilleren eller negatives for fjenden).
+- Shop med Upgrades/Powerups (flere eller forskellige slags vægge, større map og andre positives for spilleren eller negatives for fjenden).
 
 - Sværhedsgrader til fjende/maps.
 
@@ -53,7 +53,8 @@ LevelManager
 **Kilder:**
 
 **Inspiration:**
-Capture the flag, Bloons Tower Defense (defense spil generelt).
+
+Capture the flag, Bloons Tower Defense og alle defense spil generelt.
 
 ### Infrastruktur
 Github: https://github.com/DQL678/Algoritmer
