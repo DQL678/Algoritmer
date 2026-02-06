@@ -54,7 +54,7 @@ LevelManager
 
 **Pathfinding**
 
-Pathfinding - Understanding A* (A star)
+Pathfinding - Understanding A* (A star):
    - https://www.youtube.com/watch?v=i0x5fj4PqP4&t=55s
 
 A* Pathfinding Visualized (YouTube): 
@@ -70,7 +70,7 @@ Big O Notation Tutorial - A Guide to Big O Analysis:
 
 **Inspiration:**
 
-Capture the flag, Bloons Tower Defense (defense spil generelt).
+Capture the Flag, Bloons Tower Defense (defense spil generelt).
 
 **Idéer til libraries:**
 pygame – Grafisk visning af grid og objekter.
