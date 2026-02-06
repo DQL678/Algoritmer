@@ -65,14 +65,15 @@ A* Search Algorithm:
 
 **Algoritme-analyse**
 
-Big O Notation Tutorial - A Guide to Big O Analysis
+Big O Notation Tutorial - A Guide to Big O Analysis:
    - https://www.geeksforgeeks.org/dsa/analysis-algorithms-big-o-analysis/
 
 **Inspiration:**
+
 Capture the flag, Bloons Tower Defense (defense spil generelt).
 
 **Idéer til libraries:**
-pygame – grafisk visning af grid og objekter .
+pygame – Grafisk visning af grid og objekter.
 
 ### Infrastruktur
 Github: https://github.com/DQL678/Algoritmer
