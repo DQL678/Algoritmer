@@ -5,6 +5,7 @@ Vi har i gruppen tænkt os at lave et spil, der hedder "Protect at All Costs", s
 
 ### Programstruktur
 Programmet er designet som et strategispil med ture og niveauer. I hver runde gennemløbes en fast struktur, hvor spilleren først opstiller sit forsvar, hvorefter algoritmen benytter pathfinding til at forsøge at nå spillerens flag.
+
 **Overordnet flow:**
 1. Spillet starter og mappet genereres som et grid
 2. Algoritmens spawn-position placeres (foruddefineret/random)
@@ -19,15 +20,21 @@ Programmet er designet som et strategispil med ture og niveauer. I hver runde ge
 9. Næste level starter med øget sværhedsgrad
 
 **Klassestruktur**
+
 Programmet kan struktureres med følgende klasser/moduler (vi er ikke helt sikker endnu):
+
 Game
    - Styrer spillets flow, levels og regler
+
 Grid / Map
    - Repræsenterer spillebanen og håndterer placering af vægge, flag og algoritme
+
 AIPathfinder
    - Indeholder pathfinding-algoritmen og step-tælling
+
 Player
    - Håndterer spillerens ressourcer (penge, vægge, flag-placering)
+
 LevelManager
    - Justerer sværhedsgrad, step-limit og belønninger mellem levels
 
