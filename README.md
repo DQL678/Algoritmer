@@ -52,9 +52,27 @@ LevelManager
 ### Kilder/inspiration
 **Kilder:**
 
-**Inspiration:**
+**Pathfinding**
 
-Capture the flag, Bloons Tower Defense og alle defense spil generelt.
+Pathfinding - Understanding A* (A star)
+   - https://www.youtube.com/watch?v=i0x5fj4PqP4&t=55s
+
+A* Pathfinding Visualized (YouTube): 
+   - https://www.youtube.com/watch?v=-L-WgKMFuhE
+
+A* Search Algorithm: 
+   - https://www.geeksforgeeks.org/dsa/a-search-algorithm/
+
+**Algoritme-analyse**
+
+Big O Notation Tutorial - A Guide to Big O Analysis
+   - https://www.geeksforgeeks.org/dsa/analysis-algorithms-big-o-analysis/
+
+**Inspiration:**
+Capture the flag, Bloons Tower Defense (defense spil generelt).
+
+**Idéer til libraries:**
+pygame – grafisk visning af grid og objekter .
 
 ### Infrastruktur
 Github: https://github.com/DQL678/Algoritmer
