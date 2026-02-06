@@ -38,7 +38,9 @@ LevelManager
 
 - Placering af vægge/blocks fra spiller.
 
-- Shop med Upgrades/Powerups (flere vægge/Forskellige slags vægge, større map og andre positives for spilleren).
+- Shop med Upgrades/Powerups (flere vægge/Forskellige slags vægge, større map og andre positives for spilleren eller negatives for fjenden).
+
+- Sværhedsgrader til fjende/maps
 
 ### Kilder/inspiration
 Capture the flag, Bloons Tower Defense (defense spil generelt).
