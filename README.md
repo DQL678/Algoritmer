@@ -50,6 +50,9 @@ LevelManager
 - Sværhedsgrader til fjende/maps.
 
 ### Kilder/inspiration
+**Kilder:**
+
+**Inspiration:**
 Capture the flag, Bloons Tower Defense (defense spil generelt).
 
 ### Infrastruktur
