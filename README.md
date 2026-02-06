@@ -6,9 +6,6 @@ Vi har i gruppen tænkt os at lave et spil, der hedder "Protect at All Cost", so
 ### Programstruktur
 
 
-### Systemmarkitektur
-
-
 ### Liste af features
 - Pathfinding af fjende (fra start til slutpunkt).
 
