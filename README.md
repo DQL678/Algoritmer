@@ -34,13 +34,13 @@ LevelManager
 ### Liste af features
 - Pathfinding af fjende (fra start til slutpunkt).
 
-- Gridmap
+- Gridmap.
 
-- Placering af vægge/blocks fra spiller.
+- Placering af flag og vægge/blocks i grids fra spiller.
 
 - Shop med Upgrades/Powerups (flere vægge/Forskellige slags vægge, større map og andre positives for spilleren eller negatives for fjenden).
 
-- Sværhedsgrader til fjende/maps
+- Sværhedsgrader til fjende/maps.
 
 ### Kilder/inspiration
 Capture the flag, Bloons Tower Defense (defense spil generelt).
