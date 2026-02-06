@@ -10,10 +10,16 @@ Vi har i gruppen tænkt os at lave et spil, der hedder "Protect at All Cost", so
 
 
 ### Liste af features
-Upgrades/Powerups (flere vægge/Forskellige slags vægge, større map og andre positives for spilleren)
+- Pathfinding af fjende (fra start til slutpunkt).
+
+- Gridmap
+
+- Placering af vægge/blocks fra spiller.
+
+- Shop med Upgrades/Powerups (flere vægge/Forskellige slags vægge, større map og andre positives for spilleren).
 
 ### Kilder/inspiration
-Capture the flag, Bloons tower defense (defense spil generelt)
+Capture the flag, Bloons Tower Defense (defense spil generelt).
 
 ### Infrastruktur
 Github: https://github.com/DQL678/Algoritmer
