@@ -1,0 +1,1 @@
+#Spilleren og input (mønter, vægge)
