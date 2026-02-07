@@ -3,8 +3,8 @@ import math
 
 # Skærmindstillinger
 WIDTH, HEIGHT = 1000, 800
-RADIUS = 15
-ROWS, COLS = 30, 30
+RADIUS = 10
+ROWS, COLS = 50, 55
 
 # Farver
 BG_COLOR = (20, 20, 20)
