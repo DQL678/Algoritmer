@@ -42,16 +42,21 @@ def draw_hex(surface, x, y, color):
     pygame.draw.polygon(surface, color, points)
     pygame.draw.polygon(surface, LINE_COLOR, points, 1)
 
-# Find hvilken hex der klikkes på
+# Klik-detection
 def hex_from_pos(pos):
     px, py = pos
-    py -= 40
+    closest = None
+    min_dist = float("inf")
+
     for row in range(ROWS):
         for col in range(COLS):
             cx, cy = hex_center(col, row)
-            if math.hypot(px - cx, py - cy) < RADIUS:
-                return col, row
-    return None
+            dist = math.hypot(px - cx, py - cy)
+            if dist < min_dist:
+                min_dist = dist
+                closest = (col, row)
+
+    return closest
 
 # Kør spillet
 def run_hex_map():
