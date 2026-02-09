@@ -1,71 +1,53 @@
 import pygame
-import math
 import random
 from enemy import a_star_search
 
 # Skærmindstillinger
-WIDTH, HEIGHT = 1000, 800
-RADIUS = 10
-ROWS, COLS = 50, 55
+WIDTH, HEIGHT = 1200, 700
+TILE_SIZE = 12
+
+# Beregn rækker og kolonner
+ROWS, COLS = (HEIGHT - 40) // TILE_SIZE, WIDTH // TILE_SIZE
+
 
 # Farver
 BG_COLOR = (20, 20, 20)
-HEX_COLOR = (100, 180, 250)
+TILE_COLOR = (100, 180, 250)
 LINE_COLOR = (50, 50, 50)
 ENEMY_COLOR = (200, 50, 50)
 FLAG_COLOR = (50, 200, 50)
 PATH_COLOR = (255, 255, 0)
 BUTTON_COLOR = (100, 100, 100)
 
-# Hexagon dimensioner
-HEX_WIDTH = math.sqrt(3) * RADIUS
-HEX_HEIGHT = 2 * RADIUS
-HORIZ_SPACING = HEX_WIDTH
-VERT_SPACING = 0.75 * HEX_HEIGHT
+# Find center af en firkant
+def square_center(col, row):
+    x = col * TILE_SIZE
+    y = row * TILE_SIZE + 40  # plads til knap
+    return x, y
 
-# Hexagon center-beregning
-def hex_center(col, row):
-    x = col * HORIZ_SPACING
-    y = row * VERT_SPACING + 40  # giver plads til knap
-    if col % 2 == 1:
-        y += VERT_SPACING / 2
-    return int(x + RADIUS), int(y + RADIUS)
+# Tegn en firkant
+def draw_tile(surface, col, row, color):
+    x, y = square_center(col, row)
+    pygame.draw.rect(surface, color, (x, y, TILE_SIZE, TILE_SIZE))
+    pygame.draw.rect(surface, LINE_COLOR, (x, y, TILE_SIZE, TILE_SIZE), 1)
 
-# Tegn en hexagon
-def draw_hex(surface, x, y, color):
-    points = []
-    for i in range(6):
-        angle = math.radians(60 * i)
-        px = x + RADIUS * math.cos(angle)
-        py = y + RADIUS * math.sin(angle)
-        points.append((px, py))
-    pygame.draw.polygon(surface, color, points)
-    pygame.draw.polygon(surface, LINE_COLOR, points, 1)
-
-# Klik-detection
-def hex_from_pos(pos):
+# Find firkant fra klik
+def tile_from_pos(pos):
     px, py = pos
-    closest = None
-    min_dist = float("inf")
-
-    for row in range(ROWS):
-        for col in range(COLS):
-            cx, cy = hex_center(col, row)
-            dist = math.hypot(px - cx, py - cy)
-            if dist < min_dist:
-                min_dist = dist
-                closest = (col, row)
-
-    return closest
+    py -= 40  # justering for knap
+    col = px // TILE_SIZE
+    row = py // TILE_SIZE
+    if 0 <= col < COLS and 0 <= row < ROWS:
+        return col, row
+    return None
 
 # Kør spillet
-def run_hex_map():
+def run_map():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Hex Map")
+    pygame.display.set_caption("Square Grid Map")
     clock = pygame.time.Clock()
 
-    # Initiale værdier
     start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
     goal = None
     path = []
@@ -79,30 +61,26 @@ def run_hex_map():
     while running:
         screen.fill(BG_COLOR)
 
-        # --- Tegn knap ---
+        # Knap
         pygame.draw.rect(screen, BUTTON_COLOR, button_rect)
         text = font.render("START", True, (255, 255, 255))
         screen.blit(text, (button_rect.x + 20, button_rect.y + 5))
 
-        # --- Tegn hexagoner ---
+        # Tegn grid
         for row in range(ROWS):
             for col in range(COLS):
-                cx, cy = hex_center(col, row)
-                draw_hex(screen, cx, cy, HEX_COLOR)
+                draw_tile(screen, col, row, TILE_COLOR)
 
+        # Mål og start
         if goal:
-            gx, gy = hex_center(*goal)
-            draw_hex(screen, gx, gy, FLAG_COLOR)
-
+            draw_tile(screen, *goal, FLAG_COLOR)
         if start:
-            sx, sy = hex_center(*start)
-            draw_hex(screen, sx, sy, ENEMY_COLOR)
+            draw_tile(screen, *start, ENEMY_COLOR)
 
+        # Path
         if started and path:
             for i in range(path_index + 1):
-                cx, cy = hex_center(*path[i])
-                draw_hex(screen, cx, cy, PATH_COLOR)
-
+                draw_tile(screen, *path[i], PATH_COLOR)
             if path_index < len(path) - 1:
                 path_index += 1
                 pygame.time.delay(30)
@@ -110,7 +88,6 @@ def run_hex_map():
         pygame.display.flip()
         clock.tick(60)
 
-        # --- Events ---
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -122,7 +99,7 @@ def run_hex_map():
                     path_index = 0
                     started = True
                 elif not goal:
-                    clicked = hex_from_pos((mx, my))
+                    clicked = tile_from_pos((mx, my))
                     if clicked:
                         goal = clicked
 
