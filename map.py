@@ -6,12 +6,10 @@ from player import Player
 # Skærmindstillinger
 WIDTH, HEIGHT = 1200, 700
 TILE_SIZE = 12
-
-UI_TOP = 40  # plads til knap i toppen
+UI_TOP = 40
 
 ROWS, COLS = (HEIGHT - UI_TOP) // TILE_SIZE, WIDTH // TILE_SIZE
 
-# Farver
 # Farver
 BG_COLOR = (35, 35, 35)
 TILE_COLOR = (235, 235, 235)
@@ -20,7 +18,7 @@ ENEMY_COLOR = (200, 50, 50)
 FLAG_COLOR = (0, 120, 0)
 PATH_COLOR = (255, 215, 0)
 BUTTON_COLOR = (80, 80, 80)
-
+WALL_BUTTON_COLOR = (120, 120, 120)
 
 def draw_tile(surface, col, row, color):
     x = col * TILE_SIZE
@@ -40,7 +38,7 @@ def tile_from_pos(pos):
 def run_map():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Square Grid Map")
+    pygame.display.set_caption("Protect the Flag")
     clock = pygame.time.Clock()
 
     start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
@@ -51,27 +49,38 @@ def run_map():
     started = False
 
     font = pygame.font.SysFont(None, 24)
-    button_rect = pygame.Rect(WIDTH // 2 - 50, 5, 100, 30)
+    start_button_rect = pygame.Rect(WIDTH // 2 - 50, 5, 100, 30)
+    wall_button_rect = pygame.Rect(10, 5, 140, 30)
 
     running = True
     while running:
         screen.fill(BG_COLOR)
 
-        # START knap
-        pygame.draw.rect(screen, BUTTON_COLOR, button_rect)
-        text = font.render("START", True, (255, 255, 255))
-        screen.blit(text, (button_rect.x + 20, button_rect.y + 6))
+        # START KNAP
+        pygame.draw.rect(screen, BUTTON_COLOR, start_button_rect)
+        start_text = font.render("START", True, (255, 255, 255))
+        screen.blit(start_text, (start_button_rect.x + 20, start_button_rect.y + 6))
 
-        # grid
+        # BUILD WALL KNAP
+        pygame.draw.rect(screen, WALL_BUTTON_COLOR, wall_button_rect)
+        wall_text = font.render("BUILD WALL", True, (255, 255, 255))
+        screen.blit(wall_text, (wall_button_rect.x + 10, wall_button_rect.y + 6))
+
+        # GRID
         for row in range(ROWS):
             for col in range(COLS):
                 draw_tile(screen, col, row, TILE_COLOR)
 
-        # flag + enemy
+        # WALLS
+        player.draw_walls(screen, draw_tile)
+
+        # FLAG
         player.draw_flag(screen, draw_tile, FLAG_COLOR)
+
+        # ENEMY
         draw_tile(screen, *start, ENEMY_COLOR)
 
-        # path animation
+        # PATH
         if started and path:
             for i in range(path_index + 1):
                 draw_tile(screen, *path[i], PATH_COLOR)
@@ -91,16 +100,23 @@ def run_map():
                 mx, my = pygame.mouse.get_pos()
 
                 # START
-                if button_rect.collidepoint((mx, my)) and player.get_flag() and not started:
+                if start_button_rect.collidepoint((mx, my)) and player.get_flag() and not started:
                     path = a_star_search(start, player.get_flag(), COLS, ROWS)
                     path_index = 0
                     started = True
 
-                # flyt flag (indtil start)
+                # WALL MODE TOGGLE
+                elif wall_button_rect.collidepoint((mx, my)) and not started:
+                    player.toggle_wall_mode()
+
+                # PLACERING
                 elif not started:
                     clicked = tile_from_pos((mx, my))
                     if clicked:
-                        player.set_flag(clicked)
+                        if player.wall_mode:
+                            player.add_wall(clicked)
+                        else:
+                            player.set_flag(clicked)
 
     pygame.quit()
 
