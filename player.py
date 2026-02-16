@@ -1,3 +1,4 @@
+#Flagets startposition
 class Player:
     def __init__(self):
         self.flag_position = None
