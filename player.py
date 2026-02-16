@@ -4,13 +4,16 @@ class Player:
     def __init__(self):
         self.flag_position = None
         self.walls = set()
-        self.wall_mode = False  # False = placer flag, True = placer vægge
 
-    # -------------------------
+        # Modes
+        self.build_mode = False
+        self.remove_mode = False
+
+    # -----------------
     # FLAG
-    # -------------------------
+    # -----------------
     def set_flag(self, position):
-        if position not in self.walls:  # Flag må ikke placeres på væg
+        if position not in self.walls:
             self.flag_position = position
 
     def get_flag(self):
@@ -20,18 +23,28 @@ class Player:
         if self.flag_position:
             draw_tile_func(surface, *self.flag_position, color)
 
-    # -------------------------
+    # -----------------
     # WALLS
-    # -------------------------
-    def toggle_wall_mode(self):
-        self.wall_mode = not self.wall_mode
+    # -----------------
+    def enable_build_mode(self):
+        self.build_mode = True
+        self.remove_mode = False
+
+    def enable_remove_mode(self):
+        self.remove_mode = True
+        self.build_mode = False
+
+    def disable_modes(self):
+        self.build_mode = False
+        self.remove_mode = False
 
     def add_wall(self, position):
         if position != self.flag_position:
-            if position in self.walls:
-                self.walls.remove(position)  # klik igen fjerner væg
-            else:
-                self.walls.add(position)
+            self.walls.add(position)
+
+    def remove_wall(self, position):
+        if position in self.walls:
+            self.walls.remove(position)
 
     def get_walls(self):
         return self.walls
