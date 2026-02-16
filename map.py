@@ -12,13 +12,15 @@ UI_TOP = 40  # plads til knap i toppen
 ROWS, COLS = (HEIGHT - UI_TOP) // TILE_SIZE, WIDTH // TILE_SIZE
 
 # Farver
-BG_COLOR = (20, 20, 20)
-TILE_COLOR = (100, 180, 250)
-LINE_COLOR = (50, 50, 50)
+# Farver
+BG_COLOR = (35, 35, 35)
+TILE_COLOR = (235, 235, 235)
+LINE_COLOR = (180, 180, 180)
 ENEMY_COLOR = (200, 50, 50)
-FLAG_COLOR = (50, 200, 50)
-PATH_COLOR = (255, 255, 0)
-BUTTON_COLOR = (100, 100, 100)
+FLAG_COLOR = (0, 120, 0)
+PATH_COLOR = (255, 215, 0)
+BUTTON_COLOR = (80, 80, 80)
+
 
 def draw_tile(surface, col, row, color):
     x = col * TILE_SIZE
