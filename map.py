@@ -47,6 +47,8 @@ def run_map():
     pygame.display.set_caption("Protect the Flag")
     clock = pygame.time.Clock()
 
+    steps_used = 0
+
     start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
     player = Player()
 
@@ -74,6 +76,9 @@ def run_map():
 
         pygame.draw.rect(screen, REMOVE_BUTTON_COLOR, remove_button)
         screen.blit(font.render("REMOVE", True, (255,255,255)), (remove_button.x+20, remove_button.y+6))
+
+        steps_text = font.render(f"Steps: {steps_used}", True, (255, 255, 255))
+        screen.blit(steps_text, (WIDTH - 150, 10))
 
         # ---------------- GRID ----------------
         for row in range(ROWS):
@@ -106,7 +111,7 @@ def run_map():
                 mx, my = pygame.mouse.get_pos()
 
                 if start_button.collidepoint((mx,my)) and player.get_flag() and not started:
-                    path = a_star_search(
+                    path, steps_used = a_star_search(
                         start,
                         player.get_flag(),
                         COLS,

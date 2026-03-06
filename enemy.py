@@ -33,8 +33,11 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
     came_from = {}
     cost_so_far = {start: 0}
 
+    steps = 0
+
     while open_set:
         _, current = heapq.heappop(open_set)
+        steps += 1
 
         if current == goal:
             break
@@ -55,7 +58,7 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
 
     # Hvis ingen vej findes
     if goal not in came_from and goal != start:
-        return []
+        return [], steps
 
     # Rekonstruer path
     path = []
@@ -65,9 +68,9 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
         path.append(current)
         current = came_from.get(current)
         if current is None:
-            return []
+            return [], steps
 
     path.append(start)
     path.reverse()
 
-    return path
+    return path, steps
