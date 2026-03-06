@@ -141,7 +141,17 @@ def run_map():
                         dragging = True
 
                         if player.build_mode:
+                            # placer væg midlertidigt
                             player.add_wall(clicked)
+
+                            # hvis flag findes, test path
+                            if player.get_flag():
+                                path_test, _ = a_star_search(start,player.get_flag(),COLS,ROWS,blocked=player.get_walls())
+
+                                # hvis ingen path → fjern væg
+                                if not path_test:
+                                    player.remove_wall(clicked)
+
                         elif player.remove_mode:
                             player.remove_wall(clicked)
                         else:
@@ -156,7 +166,17 @@ def run_map():
                     clicked = tile_from_pos((mx,my))
                     if clicked:
                         if player.build_mode:
+                            # placer væg midlertidigt
                             player.add_wall(clicked)
+
+                            # hvis flag findes, test path
+                            if player.get_flag():
+                                path_test, _ = a_star_search(start,player.get_flag(),COLS,ROWS,blocked=player.get_walls())
+
+                                # hvis ingen path → fjern væg
+                                if not path_test:
+                                    player.remove_wall(clicked)
+
                         elif player.remove_mode:
                             player.remove_wall(clicked)
 
