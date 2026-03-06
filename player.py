@@ -34,9 +34,13 @@ class Player:
         self.build_mode = False
         self.remove_mode = False
 
-    def add_wall(self, position):
-        if position != self.flag_position:
-            self.walls.add(position)
+    def add_wall(self, position, start=None):
+        if position == self.flag_position:
+            return
+        if start and position == start:
+            return
+
+        self.walls.add(position)
 
     def remove_wall(self, position):
         if position in self.walls:
