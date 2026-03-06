@@ -41,7 +41,7 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
 
         for neighbor in get_neighbors(current, max_cols, max_rows):
 
-            # 🔥 IGNORER WALLS
+            # IGNORER WALLS
             if neighbor in blocked:
                 continue
 
