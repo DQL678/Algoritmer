@@ -47,8 +47,6 @@ def run_map():
     pygame.display.set_caption("Protect the Flag")
     clock = pygame.time.Clock()
 
-    steps_used = 0
-
     start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
     player = Player()
 
@@ -56,6 +54,10 @@ def run_map():
     path_index = 0
     started = False
     dragging = False
+
+    # NYT
+    path_length = 0
+    show_path_length = False
 
     font = pygame.font.SysFont(None, 24)
 
@@ -77,8 +79,10 @@ def run_map():
         pygame.draw.rect(screen, REMOVE_BUTTON_COLOR, remove_button)
         screen.blit(font.render("REMOVE", True, (255,255,255)), (remove_button.x+20, remove_button.y+6))
 
-        steps_text = font.render(f"Steps: {steps_used}", True, (255, 255, 255))
-        screen.blit(steps_text, (WIDTH - 150, 10))
+        # VIS PATH-LÆNGDE KUN NÅR ANIMATIONEN ER FÆRDIG
+        if show_path_length:
+            length_text = font.render(f"Path length: {path_length}", True, (255,255,255))
+            screen.blit(length_text, (WIDTH - 200, 10))
 
         # ---------------- GRID ----------------
         for row in range(ROWS):
@@ -97,6 +101,8 @@ def run_map():
             if path_index < len(path) - 1:
                 path_index += 1
                 pygame.time.delay(20)
+            else:
+                show_path_length = True
 
         pygame.display.flip()
         clock.tick(60)
@@ -110,23 +116,29 @@ def run_map():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
 
+                # START KNAP
                 if start_button.collidepoint((mx,my)) and player.get_flag() and not started:
-                    path, steps_used = a_star_search(
+                    path, _ = a_star_search(
                         start,
                         player.get_flag(),
                         COLS,
                         ROWS,
                         blocked=player.get_walls()
                     )
+                    path_length = len(path)
                     path_index = 0
                     started = True
+                    show_path_length = False
 
+                # BUILD MODE
                 elif build_button.collidepoint((mx,my)) and not started:
                     player.enable_build_mode()
 
+                # REMOVE MODE
                 elif remove_button.collidepoint((mx,my)) and not started:
                     player.enable_remove_mode()
 
+                # KLIK PÅ GRID
                 elif not started:
                     clicked = tile_from_pos((mx,my))
                     if clicked:
@@ -134,10 +146,8 @@ def run_map():
 
                         if player.build_mode:
                             player.add_wall(clicked)
-
                         elif player.remove_mode:
                             player.remove_wall(clicked)
-
                         else:
                             player.set_flag(clicked)
 
@@ -149,10 +159,8 @@ def run_map():
                     mx, my = pygame.mouse.get_pos()
                     clicked = tile_from_pos((mx,my))
                     if clicked:
-
                         if player.build_mode:
                             player.add_wall(clicked)
-
                         elif player.remove_mode:
                             player.remove_wall(clicked)
 
