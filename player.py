@@ -9,9 +9,7 @@ class Player:
         self.build_mode = False
         self.remove_mode = False
 
-    # -----------------
-    # FLAG
-    # -----------------
+    # flag
     def set_flag(self, position):
         if position not in self.walls:
             self.flag_position = position
@@ -23,9 +21,7 @@ class Player:
         if self.flag_position:
             draw_tile_func(surface, *self.flag_position, color)
 
-    # -----------------
-    # WALLS
-    # -----------------
+    # vægge
     def enable_build_mode(self):
         self.build_mode = True
         self.remove_mode = False

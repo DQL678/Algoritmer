@@ -3,9 +3,7 @@ import random
 from enemy import a_star_search
 from player import Player
 
-# -----------------------------
-# SKÆRMINDSTILLINGER
-# -----------------------------
+# Skærmindstillinger
 WIDTH, HEIGHT = 1200, 700
 TILE_SIZE = 12
 UI_TOP = 40
@@ -13,9 +11,7 @@ UI_TOP = 40
 ROWS = (HEIGHT - UI_TOP) // TILE_SIZE
 COLS = WIDTH // TILE_SIZE
 
-# -----------------------------
 # FARVER
-# -----------------------------
 BG_COLOR = (35, 35, 35)
 TILE_COLOR = (235, 235, 235)
 LINE_COLOR = (180, 180, 180)
@@ -55,7 +51,7 @@ def run_map():
     started = False
     dragging = False
 
-    # NYT
+    # Nyt
     path_length = 0
     show_path_length = False
 
@@ -69,7 +65,7 @@ def run_map():
     while running:
         screen.fill(BG_COLOR)
 
-        # ---------------- UI ----------------
+        # UI
         pygame.draw.rect(screen, BUTTON_COLOR, start_button)
         screen.blit(font.render("START", True, (255,255,255)), (start_button.x+20, start_button.y+6))
 
@@ -79,12 +75,12 @@ def run_map():
         pygame.draw.rect(screen, REMOVE_BUTTON_COLOR, remove_button)
         screen.blit(font.render("REMOVE", True, (255,255,255)), (remove_button.x+20, remove_button.y+6))
 
-        # VIS PATH-LÆNGDE KUN NÅR ANIMATIONEN ER FÆRDIG
+        # Vis path-længde kun når animation er færdig
         if show_path_length:
             length_text = font.render(f"Path length: {path_length}", True, (255,255,255))
             screen.blit(length_text, (WIDTH - 200, 10))
 
-        # ---------------- GRID ----------------
+        # Grid
         for row in range(ROWS):
             for col in range(COLS):
                 draw_tile(screen, col, row, TILE_COLOR)
@@ -93,7 +89,7 @@ def run_map():
         player.draw_flag(screen, draw_tile, FLAG_COLOR)
         draw_tile(screen, *start, ENEMY_COLOR)
 
-        # ---------------- PATH ----------------
+        # Path
         if started and path:
             for i in range(path_index + 1):
                 draw_tile(screen, *path[i], PATH_COLOR)
@@ -107,7 +103,7 @@ def run_map():
         pygame.display.flip()
         clock.tick(60)
 
-        # ---------------- EVENTS ----------------
+        # Events
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -116,7 +112,7 @@ def run_map():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
 
-                # START KNAP
+                # Start knap
                 if start_button.collidepoint((mx,my)) and player.get_flag() and not started:
                     path, _ = a_star_search(
                         start,
@@ -130,15 +126,15 @@ def run_map():
                     started = True
                     show_path_length = False
 
-                # BUILD MODE
+                # Build mode
                 elif build_button.collidepoint((mx,my)) and not started:
                     player.enable_build_mode()
 
-                # REMOVE MODE
+                # Remove mode
                 elif remove_button.collidepoint((mx,my)) and not started:
                     player.enable_remove_mode()
 
-                # KLIK PÅ GRID
+                # Klik på grid
                 elif not started:
                     clicked = tile_from_pos((mx,my))
                     if clicked:
