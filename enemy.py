@@ -1,4 +1,5 @@
 import heapq
+from collections import deque
 
 # 4-retningers grid (firkantet map)
 def get_neighbors(pos, max_cols, max_rows):
@@ -23,6 +24,10 @@ def manhattan(a, b):
     return abs(x1 - x2) + abs(y1 - y2)
 
 
+# -------------------------
+# HARD = A*
+# Returnerer: path, steps, visited_tiles
+# -------------------------
 def a_star_search(start, goal, max_cols, max_rows, blocked=None):
     if blocked is None:
         blocked = set()
@@ -33,18 +38,18 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
     came_from = {}
     cost_so_far = {start: 0}
 
+    visited = []
     steps = 0
 
     while open_set:
         _, current = heapq.heappop(open_set)
+        visited.append(current)
         steps += 1
 
         if current == goal:
             break
 
         for neighbor in get_neighbors(current, max_cols, max_rows):
-
-            # IGNORER WALLS
             if neighbor in blocked:
                 continue
 
@@ -56,11 +61,9 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
                 heapq.heappush(open_set, (priority, neighbor))
                 came_from[neighbor] = current
 
-    # Hvis ingen vej findes
     if goal not in came_from and goal != start:
-        return [], steps
+        return [], steps, visited
 
-    # Rekonstruer path
     path = []
     current = goal
 
@@ -68,9 +71,68 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
         path.append(current)
         current = came_from.get(current)
         if current is None:
-            return [], steps
+            return [], steps, visited
 
     path.append(start)
     path.reverse()
 
-    return path, steps
+    return path, steps, visited
+
+
+# -------------------------
+# EASY = BFS
+# Returnerer: path, steps, visited_tiles
+# -------------------------
+def bfs_search(start, goal, max_cols, max_rows, blocked=None):
+    if blocked is None:
+        blocked = set()
+
+    queue = deque([start])
+    came_from = {start: None}
+    visited_set = {start}
+
+    visited = []
+    steps = 0
+
+    while queue:
+        current = queue.popleft()
+        visited.append(current)
+        steps += 1
+
+        if current == goal:
+            break
+
+        for neighbor in get_neighbors(current, max_cols, max_rows):
+            if neighbor in blocked:
+                continue
+
+            if neighbor not in visited_set:
+                visited_set.add(neighbor)
+                queue.append(neighbor)
+                came_from[neighbor] = current
+
+    if goal not in came_from and goal != start:
+        return [], steps, visited
+
+    path = []
+    current = goal
+
+    while current != start:
+        path.append(current)
+        current = came_from.get(current)
+        if current is None:
+            return [], steps, visited
+
+    path.append(start)
+    path.reverse()
+
+    return path, steps, visited
+
+
+# -------------------------
+# Difficulty selector
+# -------------------------
+def get_pathfinder(difficulty):
+    if difficulty == "easy":
+        return bfs_search
+    return a_star_search
