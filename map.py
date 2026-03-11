@@ -73,12 +73,15 @@ def run_map(difficulty="hard"):
     search_steps = 0
     show_path_info = False
 
+    lives = 3
+
     font = pygame.font.SysFont(None, 24)
 
     start_button = pygame.Rect(WIDTH // 2 - 50, 5, 100, 30)
     build_button = pygame.Rect(10, 5, 120, 30)
     remove_button = pygame.Rect(140, 5, 130, 30)
     move_flag_button = pygame.Rect(280, 5, 140, 30)
+    restart_button = pygame.Rect(430, 5, 120, 30)
 
     running = True
 
@@ -101,8 +104,14 @@ def run_map(difficulty="hard"):
         pygame.draw.rect(screen, current_move_color, move_flag_button)
         screen.blit(font.render("MOVE FLAG", True, (255, 255, 255)), (move_flag_button.x + 10, move_flag_button.y + 6))
 
+        pygame.draw.rect(screen, BUTTON_COLOR, restart_button)
+        screen.blit(font.render("RESTART", True, (255, 255, 255)), (restart_button.x + 10, restart_button.y + 6))
+
         difficulty_text = font.render(f"Difficulty: {difficulty.upper()}", True, (255,255,255))
         screen.blit(difficulty_text, (WIDTH - 420, 10))
+
+        lives_text = font.render(f"Lives: {lives}", True, (255, 255, 255))
+        screen.blit(lives_text, (WIDTH - 520, 10))
 
         if show_path_info:
             length_text = font.render(f"Path: {path_length}", True, (255,255,255))
@@ -194,6 +203,20 @@ def run_map(difficulty="hard"):
 
                 elif move_flag_button.collidepoint((mx,my)) and not started and not searching:
                     player.toggle_move_flag_mode()
+
+                elif restart_button.collidepoint((mx, my)):
+                    # Nulstil alt
+                    start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
+                    player = Player()
+                    path = []
+                    search_tiles = []
+                    path_index = 0
+                    search_index = 0
+                    started = False
+                    searching = False
+                    show_path_info = False
+                    path_length = 0
+                    search_steps = 0
 
                 elif not started and not searching:
 
