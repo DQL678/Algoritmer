@@ -307,3 +307,54 @@ def run_map(game_manager):
 
                             elif player.move_flag_mode:
                                 player.set_flag(clicked)
+
+                # Keybinds
+                elif event.type == pygame.KEYDOWN:
+
+                    # F: Move Flag Mode
+                    if event.key == pygame.K_f and not started and not searching:
+                        player.toggle_move_flag_mode()
+
+                    # B: Build Mode
+                    if event.key == pygame.K_b and not started and not searching:
+                        player.toggle_build_mode()
+
+                    # R: Remove Mode
+                    if event.key == pygame.K_r and not started and not searching:
+                        player.toggle_remove_mode()
+
+                    # S: Start pathfinding
+                    if event.key == pygame.K_s and player.get_flag() and not started and not searching:
+                        path, search_steps, search_tiles = pathfinder(
+                            start,
+                            player.get_flag(),
+                            COLS,
+                            ROWS,
+                            blocked=player.get_walls()
+                        )
+                        path_length = len(path)
+                        path_index = 0
+                        search_index = 0
+                        searching = True
+                        started = False
+                        show_path_info = False
+                        result_message = None
+
+                    # G: Restart game
+                    if event.key == pygame.K_g:
+                        start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
+                        player = Player()
+                        player.max_walls = wall_limit
+                        path = []
+                        search_tiles = []
+                        path_index = 0
+                        search_index = 0
+                        started = False
+                        searching = False
+                        show_path_info = False
+                        path_length = 0
+                        search_steps = 0
+                        result_message = None
+                        waiting_after_result = False
+                        dragging = False
+
