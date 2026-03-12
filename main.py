@@ -38,7 +38,7 @@ def open_difficulty_window():
     save_button.pack(pady=15)
 
 def start_game():
-    run_map(game_manager.get_difficulty())
+    run_map(game_manager)
 
 root = tk.Tk()
 root.title("Main Menu")

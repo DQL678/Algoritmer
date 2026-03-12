@@ -5,7 +5,7 @@ from player import Player
 
 WIDTH, HEIGHT = 1200, 700
 TILE_SIZE = 12
-UI_TOP = 40
+UI_TOP = 60
 
 ROWS = (HEIGHT - UI_TOP) // TILE_SIZE
 COLS = WIDTH // TILE_SIZE
@@ -47,245 +47,242 @@ def tile_from_pos(pos):
     return None
 
 
-def run_map(difficulty="hard"):
-
+def run_map(game_manager):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption(f"Protect the Flag - {difficulty.upper()}")
     clock = pygame.time.Clock()
 
-    pathfinder = get_pathfinder(difficulty)
+    while True:
+        difficulty = game_manager.get_difficulty()
+        level = game_manager.get_level()
+        step_limit = game_manager.get_step_limit()
+        wall_limit = game_manager.get_wall_limit()
 
-    start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
-    player = Player()
+        pygame.display.set_caption(f"Protect the Flag - {difficulty.upper()} - Level {level}")
 
-    path = []
-    search_tiles = []
+        pathfinder = get_pathfinder(difficulty)
 
-    path_index = 0
-    search_index = 0
+        start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
+        player = Player()
+        player.max_walls = wall_limit
 
-    started = False
-    searching = False
-    dragging = False
+        path = []
+        search_tiles = []
 
-    path_length = 0
-    search_steps = 0
-    show_path_info = False
+        path_index = 0
+        search_index = 0
 
-    lives = 3
+        started = False
+        searching = False
+        dragging = False
 
-    font = pygame.font.SysFont(None, 24)
+        path_length = 0
+        search_steps = 0
+        show_path_info = False
 
-    start_button = pygame.Rect(WIDTH // 2 - 50, 5, 100, 30)
-    build_button = pygame.Rect(10, 5, 120, 30)
-    remove_button = pygame.Rect(140, 5, 130, 30)
-    move_flag_button = pygame.Rect(280, 5, 140, 30)
-    restart_button = pygame.Rect(430, 5, 120, 30)
+        result_message = None
+        waiting_after_result = False
 
-    running = True
+        font = pygame.font.SysFont(None, 24)
+        big_font = pygame.font.SysFont(None, 36)
 
-    while running:
+        start_button = pygame.Rect(WIDTH // 2 - 50, 5, 100, 30)
+        build_button = pygame.Rect(10, 5, 120, 30)
+        remove_button = pygame.Rect(140, 5, 130, 30)
+        move_flag_button = pygame.Rect(280, 5, 140, 30)
 
-        screen.fill(BG_COLOR)
+        running = True
+        while running:
+            screen.fill(BG_COLOR)
 
-        pygame.draw.rect(screen, BUTTON_COLOR, start_button)
-        screen.blit(font.render("START", True, (255, 255, 255)), (start_button.x + 20, start_button.y + 6))
+            pygame.draw.rect(screen, BUTTON_COLOR, start_button)
+            screen.blit(font.render("START", True, (255, 255, 255)), (start_button.x + 20, start_button.y + 6))
 
-        current_build_color = ACTIVE_BUILD_BUTTON_COLOR if player.build_mode else BUILD_BUTTON_COLOR
-        pygame.draw.rect(screen, current_build_color, build_button)
-        screen.blit(font.render("BUILD", True, (255, 255, 255)), (build_button.x + 25, build_button.y + 6))
+            current_build_color = ACTIVE_BUILD_BUTTON_COLOR if player.build_mode else BUILD_BUTTON_COLOR
+            pygame.draw.rect(screen, current_build_color, build_button)
+            screen.blit(font.render("BUILD", True, (255, 255, 255)), (build_button.x + 25, build_button.y + 6))
 
-        current_remove_color = ACTIVE_REMOVE_BUTTON_COLOR if player.remove_mode else REMOVE_BUTTON_COLOR
-        pygame.draw.rect(screen, current_remove_color, remove_button)
-        screen.blit(font.render("REMOVE", True, (255, 255, 255)), (remove_button.x + 20, remove_button.y + 6))
+            current_remove_color = ACTIVE_REMOVE_BUTTON_COLOR if player.remove_mode else REMOVE_BUTTON_COLOR
+            pygame.draw.rect(screen, current_remove_color, remove_button)
+            screen.blit(font.render("REMOVE", True, (255, 255, 255)), (remove_button.x + 20, remove_button.y + 6))
 
-        current_move_color = ACTIVE_MOVE_BUTTON_COLOR if player.move_flag_mode else MOVE_BUTTON_COLOR
-        pygame.draw.rect(screen, current_move_color, move_flag_button)
-        screen.blit(font.render("MOVE FLAG", True, (255, 255, 255)), (move_flag_button.x + 10, move_flag_button.y + 6))
+            current_move_color = ACTIVE_MOVE_BUTTON_COLOR if player.move_flag_mode else MOVE_BUTTON_COLOR
+            pygame.draw.rect(screen, current_move_color, move_flag_button)
+            screen.blit(font.render("MOVE FLAG", True, (255, 255, 255)), (move_flag_button.x + 10, move_flag_button.y + 6))
 
-        pygame.draw.rect(screen, BUTTON_COLOR, restart_button)
-        screen.blit(font.render("RESTART", True, (255, 255, 255)), (restart_button.x + 10, restart_button.y + 6))
+            difficulty_text = font.render(f"Difficulty: {difficulty.upper()}", True, (255, 255, 255))
+            screen.blit(difficulty_text, (WIDTH - 450, 8))
 
-        difficulty_text = font.render(f"Difficulty: {difficulty.upper()}", True, (255,255,255))
-        screen.blit(difficulty_text, (WIDTH - 420, 10))
+            level_text = font.render(f"Level: {level}", True, (255, 255, 255))
+            screen.blit(level_text, (WIDTH - 320, 8))
 
-        lives_text = font.render(f"Lives: {lives}", True, (255, 255, 255))
-        screen.blit(lives_text, (WIDTH - 520, 10))
+            limit_text = font.render(f"Step limit: {step_limit}", True, (255, 255, 255))
+            screen.blit(limit_text, (WIDTH - 220, 8))
 
-        if show_path_info:
-            length_text = font.render(f"Path: {path_length}", True, (255,255,255))
-            steps_text = font.render(f"Steps: {search_steps}", True, (255,255,255))
+            wall_text = font.render(f"Walls: {len(player.get_walls())}/{player.max_walls}", True, (255, 255, 255))
+            screen.blit(wall_text, (WIDTH - 450, 32))
 
-            screen.blit(length_text, (WIDTH - 250, 10))
-            screen.blit(steps_text, (WIDTH - 120, 10))
+            if show_path_info:
+                path_text = font.render(f"Path: {path_length}", True, (255, 255, 255))
+                steps_text = font.render(f"Steps: {search_steps}", True, (255, 255, 255))
+                screen.blit(path_text, (WIDTH - 250, 32))
+                screen.blit(steps_text, (WIDTH - 120, 32))
 
-        for row in range(ROWS):
-            for col in range(COLS):
-                draw_tile(screen, col, row, TILE_COLOR)
+            objective_text = font.render(
+                f"Objective: make algorithm use MORE than {step_limit} search steps",
+                True,
+                (255, 255, 255)
+            )
+            screen.blit(objective_text, (10, HEIGHT - 25))
 
-        player.draw_walls(screen, draw_tile)
-        player.draw_flag(screen, draw_tile, FLAG_COLOR)
-        draw_tile(screen, *start, ENEMY_COLOR)
+            for row in range(ROWS):
+                for col in range(COLS):
+                    draw_tile(screen, col, row, TILE_COLOR)
 
-        if searching and search_tiles:
+            player.draw_walls(screen, draw_tile)
+            player.draw_flag(screen, draw_tile, FLAG_COLOR)
+            draw_tile(screen, *start, ENEMY_COLOR)
 
-            for i in range(search_index + 1):
+            if searching and search_tiles:
+                for i in range(search_index + 1):
+                    tile = search_tiles[i]
+                    if tile != start and tile != player.get_flag():
+                        draw_tile(screen, *tile, SEARCH_COLOR)
 
-                tile = search_tiles[i]
-
-                if tile != start and tile != player.get_flag():
-                    draw_tile(screen, *tile, SEARCH_COLOR)
-
-            if search_index < len(search_tiles) - 1:
-                search_index += 1
-                pygame.time.delay(5)
-
-            else:
-                searching = False
-                started = True
-
-        if started and path:
-
-            for i in range(path_index + 1):
-
-                tile = path[i]
-
-                if tile != start and tile != player.get_flag():
-                    draw_tile(screen, *tile, PATH_COLOR)
-
-            if path_index < len(path) - 1:
-                path_index += 1
-                pygame.time.delay(20)
-
-            else:
-                show_path_info = True
-
-        player.draw_flag(screen, draw_tile, FLAG_COLOR)
-        draw_tile(screen, *start, ENEMY_COLOR)
-
-        pygame.display.flip()
-        clock.tick(60)
-
-        for event in pygame.event.get():
-
-            if event.type == pygame.QUIT:
-                running = False
-
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-
-                mx, my = pygame.mouse.get_pos()
-
-                if start_button.collidepoint((mx,my)) and player.get_flag() and not started and not searching:
-
-                    path, search_steps, search_tiles = pathfinder(
-                        start,
-                        player.get_flag(),
-                        COLS,
-                        ROWS,
-                        blocked=player.get_walls()
-                    )
-
-                    path_length = len(path)
-
-                    path_index = 0
-                    search_index = 0
-
-                    searching = True
-                    started = False
-                    show_path_info = False
-
-                elif build_button.collidepoint((mx,my)) and not started and not searching:
-                    player.toggle_build_mode()
-
-                elif remove_button.collidepoint((mx,my)) and not started and not searching:
-                    player.toggle_remove_mode()
-
-                elif move_flag_button.collidepoint((mx,my)) and not started and not searching:
-                    player.toggle_move_flag_mode()
-
-                elif restart_button.collidepoint((mx, my)):
-                    # Nulstil alt
-                    start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
-                    player = Player()
-                    path = []
-                    search_tiles = []
-                    path_index = 0
-                    search_index = 0
-                    started = False
+                if search_index < len(search_tiles) - 1:
+                    search_index += 1
+                    pygame.time.delay(5)
+                else:
                     searching = False
-                    show_path_info = False
-                    path_length = 0
-                    search_steps = 0
+                    started = True
 
-                elif not started and not searching:
+            if started and path:
+                for i in range(path_index + 1):
+                    tile = path[i]
+                    if tile != start and tile != player.get_flag():
+                        draw_tile(screen, *tile, PATH_COLOR)
 
-                    clicked = tile_from_pos((mx,my))
+                if path_index < len(path) - 1:
+                    path_index += 1
+                    pygame.time.delay(20)
+                else:
+                    show_path_info = True
 
-                    if clicked:
+                    if not waiting_after_result:
+                        if search_steps > step_limit:
+                            if game_manager.next_level():
+                                result_message = "LEVEL COMPLETE - click to continue"
+                            else:
+                                result_message = "YOU WON THE GAME - click to restart"
+                                game_manager.restart_game()
+                        else:
+                            result_message = "YOU FAILED - click to retry level"
+                        waiting_after_result = True
 
-                        dragging = True
+            player.draw_flag(screen, draw_tile, FLAG_COLOR)
+            draw_tile(screen, *start, ENEMY_COLOR)
 
-                        if player.build_mode:
+            if result_message:
+                overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 140))
+                screen.blit(overlay, (0, 0))
 
-                            player.add_wall(clicked)
+                msg_surface = big_font.render(result_message, True, (255, 255, 255))
+                msg_rect = msg_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+                screen.blit(msg_surface, msg_rect)
 
-                            if player.get_flag():
+            pygame.display.flip()
+            clock.tick(60)
 
-                                path_test, _, _ = a_star_search(
-                                    start,
-                                    player.get_flag(),
-                                    COLS,
-                                    ROWS,
-                                    blocked=player.get_walls()
-                                )
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
 
-                                if not path_test:
-                                    player.remove_wall(clicked)
-
-                        elif player.remove_mode:
-                            player.remove_wall(clicked)
-
-                        elif player.move_flag_mode:
-                            player.set_flag(clicked)
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                dragging = False
-
-            elif event.type == pygame.MOUSEMOTION:
-
-                if dragging and not started and not searching:
-
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
-                    clicked = tile_from_pos((mx,my))
 
-                    if clicked:
+                    if waiting_after_result:
+                        running = False
+                        break
 
-                        if player.build_mode:
+                    if start_button.collidepoint((mx, my)) and player.get_flag() and not started and not searching:
+                        path, search_steps, search_tiles = pathfinder(
+                            start,
+                            player.get_flag(),
+                            COLS,
+                            ROWS,
+                            blocked=player.get_walls()
+                        )
 
-                            player.add_wall(clicked)
+                        path_length = len(path)
+                        path_index = 0
+                        search_index = 0
+                        searching = True
+                        started = False
+                        show_path_info = False
+                        result_message = None
 
-                            if player.get_flag():
+                    elif build_button.collidepoint((mx, my)) and not started and not searching:
+                        player.toggle_build_mode()
 
-                                path_test, _, _ = a_star_search(
-                                    start,
-                                    player.get_flag(),
-                                    COLS,
-                                    ROWS,
-                                    blocked=player.get_walls()
-                                )
+                    elif remove_button.collidepoint((mx, my)) and not started and not searching:
+                        player.toggle_remove_mode()
 
-                                if not path_test:
-                                    player.remove_wall(clicked)
+                    elif move_flag_button.collidepoint((mx, my)) and not started and not searching:
+                        player.toggle_move_flag_mode()
 
-                        elif player.remove_mode:
-                            player.remove_wall(clicked)
+                    elif not started and not searching:
+                        clicked = tile_from_pos((mx, my))
 
-                        elif player.move_flag_mode:
-                            player.set_flag(clicked)
+                        if clicked:
+                            dragging = True
 
-    pygame.quit()
+                            if player.build_mode:
+                                player.add_wall(clicked, start)
 
+                                if player.get_flag():
+                                    path_test, _, _ = a_star_search(
+                                        start,
+                                        player.get_flag(),
+                                        COLS,
+                                        ROWS,
+                                        blocked=player.get_walls()
+                                    )
+                                    if not path_test:
+                                        player.remove_wall(clicked)
 
-if __name__ == "__main__":
-    run_map()
+                            elif player.remove_mode:
+                                player.remove_wall(clicked)
+
+                            elif player.move_flag_mode:
+                                player.set_flag(clicked)
+
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    dragging = False
+
+                elif event.type == pygame.MOUSEMOTION:
+                    if dragging and not started and not searching:
+                        mx, my = pygame.mouse.get_pos()
+                        clicked = tile_from_pos((mx, my))
+
+                        if clicked:
+                            if player.build_mode:
+                                player.add_wall(clicked, start)
+
+                                if player.get_flag():
+                                    path_test, _, _ = a_star_search(
+                                        start,
+                                        player.get_flag(),
+                                        COLS,
+                                        ROWS,
+                                        blocked=player.get_walls()
+                                    )
+                                    if not path_test:
+                                        player.remove_wall(clicked)
+
+                            elif player.remove_mode:
+                                player.remove_wall(clicked)
+
+                            elif player.move_flag_mode:
+                                player.set_flag(clicked)

@@ -1,7 +1,7 @@
 import heapq
 from collections import deque
 
-# 4-retningers grid (firkantet map)
+# 4-retningers grid
 def get_neighbors(pos, max_cols, max_rows):
     col, row = pos
     directions = [
@@ -24,10 +24,8 @@ def manhattan(a, b):
     return abs(x1 - x2) + abs(y1 - y2)
 
 
-# -------------------------
 # HARD = A*
-# Returnerer: path, steps, visited_tiles
-# -------------------------
+# returnerer: path, steps, visited_tiles
 def a_star_search(start, goal, max_cols, max_rows, blocked=None):
     if blocked is None:
         blocked = set()
@@ -75,14 +73,11 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
 
     path.append(start)
     path.reverse()
-
     return path, steps, visited
 
 
-# -------------------------
 # EASY = BFS
-# Returnerer: path, steps, visited_tiles
-# -------------------------
+# returnerer: path, steps, visited_tiles
 def bfs_search(start, goal, max_cols, max_rows, blocked=None):
     if blocked is None:
         blocked = set()
@@ -125,13 +120,9 @@ def bfs_search(start, goal, max_cols, max_rows, blocked=None):
 
     path.append(start)
     path.reverse()
-
     return path, steps, visited
 
 
-# -------------------------
-# Difficulty selector
-# -------------------------
 def get_pathfinder(difficulty):
     if difficulty == "easy":
         return bfs_search
