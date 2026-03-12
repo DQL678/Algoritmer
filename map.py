@@ -90,6 +90,7 @@ def run_map(game_manager):
         build_button = pygame.Rect(10, 5, 120, 30)
         remove_button = pygame.Rect(140, 5, 130, 30)
         move_flag_button = pygame.Rect(280, 5, 140, 30)
+        restart_button = pygame.Rect(430, 5, 120, 30)
 
         running = True
         while running:
@@ -109,6 +110,9 @@ def run_map(game_manager):
             current_move_color = ACTIVE_MOVE_BUTTON_COLOR if player.move_flag_mode else MOVE_BUTTON_COLOR
             pygame.draw.rect(screen, current_move_color, move_flag_button)
             screen.blit(font.render("MOVE FLAG", True, (255, 255, 255)), (move_flag_button.x + 10, move_flag_button.y + 6))
+
+            pygame.draw.rect(screen, BUTTON_COLOR, restart_button)
+            screen.blit(font.render("RESTART", True, (255, 255, 255)), (restart_button.x + 15, restart_button.y + 6))
 
             difficulty_text = font.render(f"Difficulty: {difficulty.upper()}", True, (255, 255, 255))
             screen.blit(difficulty_text, (WIDTH - 450, 8))
@@ -206,7 +210,24 @@ def run_map(game_manager):
                         running = False
                         break
 
-                    if start_button.collidepoint((mx, my)) and player.get_flag() and not started and not searching:
+                    elif restart_button.collidepoint((mx, my)):
+                        start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
+                        player = Player()
+                        player.max_walls = wall_limit
+                        path = []
+                        search_tiles = []
+                        path_index = 0
+                        search_index = 0
+                        started = False
+                        searching = False
+                        show_path_info = False
+                        path_length = 0
+                        search_steps = 0
+                        result_message = None
+                        waiting_after_result = False
+                        dragging = False
+
+                    elif start_button.collidepoint((mx, my)) and player.get_flag() and not started and not searching:
                         path, search_steps, search_tiles = pathfinder(
                             start,
                             player.get_flag(),
