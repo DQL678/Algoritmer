@@ -113,7 +113,7 @@ def run_map(game_manager):
 
             current_move_color = ACTIVE_MOVE_BUTTON_COLOR if player.move_flag_mode else MOVE_BUTTON_COLOR
             pygame.draw.rect(screen, current_move_color, move_flag_button)
-            screen.blit(font.render("MOVE FLAG", True, (255, 255, 255)), (move_flag_button.x + 10, move_flag_button.y + 6))
+            screen.blit(font.render("PLACE FLAG", True, (255, 255, 255)), (move_flag_button.x + 10, move_flag_button.y + 6))
 
             pygame.draw.rect(screen, BUTTON_COLOR, restart_button)
             screen.blit(font.render("RESTART", True, (255, 255, 255)), (restart_button.x + 15, restart_button.y + 6))
