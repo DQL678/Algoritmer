@@ -60,9 +60,9 @@ def run_map(game_manager):
         creative_mode = game_manager.get_creative_mode()
 
         if creative_mode:
-            pygame.display.set_caption(f"Protect the Flag - CREATIVE MODE - {difficulty.upper()}")
+            pygame.display.set_caption(f"Protect at All Costs - CREATIVE MODE - {difficulty.upper()}")
         else:
-            pygame.display.set_caption(f"Protect the Flag - {difficulty.upper()} - Level {level}")
+            pygame.display.set_caption(f"Protect at All Costs - {difficulty.upper()} - Level {level}")
 
         pathfinder = get_pathfinder(difficulty)
 
@@ -338,3 +338,49 @@ def run_map(game_manager):
 
                             elif player.move_flag_mode:
                                 player.set_flag(clicked)
+
+                elif event.type == pygame.KEYDOWN:
+
+                    # M = tilbage til menuen
+                    if event.key == pygame.K_m:
+                        pygame.display.quit()
+                        return
+
+                    # F = Move Flag Mode
+                    if event.key == pygame.K_f and not started and not searching:
+                        player.toggle_move_flag_mode()
+
+                    # B = Build Mode
+                    if event.key == pygame.K_b and not started and not searching:
+                        player.toggle_build_mode()
+
+                    # R = Remove Mode
+                    if event.key == pygame.K_r and not started and not searching:
+                        player.toggle_remove_mode()
+
+                    # S = Start pathfinding
+                    if event.key == pygame.K_s and player.get_flag() and not started and not searching:
+                        path, search_steps, search_tiles = pathfinder(
+                            start,
+                            player.get_flag(),
+                            COLS,
+                            ROWS,
+                            blocked=player.get_walls()
+                        )
+                        path_length = len(path)
+                        path_index = 0
+                        search_index = 0
+                        searching = True
+                        started = False
+                        show_path_info = False
+                        result_message = None
+
+                    # G = Restart game
+                    if event.key == pygame.K_g:
+                        (
+                            start, player, path, search_tiles,
+                            path_index, search_index,
+                            started, searching, dragging,
+                            path_length, search_steps, show_path_info,
+                            result_message, waiting_after_result
+                        ) = reset_map_state()
