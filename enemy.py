@@ -1,18 +1,21 @@
 import heapq
 from collections import deque
-from itertools import count
 
 # 4-retningers grid
 def get_neighbors(pos, max_cols, max_rows):
     col, row = pos
     directions = [
-        (1, 0), (-1, 0),
-        (0, 1), (0, -1)
+        (1, 0),   # højre
+        (-1, 0),  # venstre
+        (0, 1),   # ned
+        (0, -1)   # op
     ]
 
     neighbors = []
     for dc, dr in directions:
-        nc, nr = col + dc, row + dr
+        nc = col + dc
+        nr = row + dr
+
         if 0 <= nc < max_cols and 0 <= nr < max_rows:
             neighbors.append((nc, nr))
 
@@ -20,9 +23,7 @@ def get_neighbors(pos, max_cols, max_rows):
 
 
 def manhattan(a, b):
-    x1, y1 = a
-    x2, y2 = b
-    return abs(x1 - x2) + abs(y1 - y2)
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
 # HARD = A*
@@ -31,49 +32,50 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
     if blocked is None:
         blocked = set()
 
-    unique = count()
+    if start == goal:
+        return [start], 0, [start]
 
     open_set = []
-    start_h = manhattan(start, goal)
-    heapq.heappush(open_set, (start_h, start_h, next(unique), start))
+    heapq.heappush(open_set, (0, start))
 
     came_from = {}
-    cost_so_far = {start: 0}
-
+    g_score = {start: 0}
     visited = []
     steps = 0
-    closed_set = set()
 
     while open_set:
-        _, _, _, current = heapq.heappop(open_set)
+        current_f, current = heapq.heappop(open_set)
 
-        if current in closed_set:
+        if current in visited:
             continue
 
-        closed_set.add(current)
         visited.append(current)
         steps += 1
 
         if current == goal:
             break
 
-        for neighbor in get_neighbors(current, max_cols, max_rows):
+        neighbors = get_neighbors(current, max_cols, max_rows)
+
+        # sortér naboer så dem tættest på målet tages først
+        neighbors.sort(key=lambda n: manhattan(n, goal))
+
+        for neighbor in neighbors:
             if neighbor in blocked:
                 continue
 
-            if neighbor in closed_set:
-                continue
+            tentative_g = g_score[current] + 1
 
-            new_cost = cost_so_far[current] + 1
-
-            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
-                cost_so_far[neighbor] = new_cost
-                h = manhattan(neighbor, goal)
-                f = new_cost + h
-                heapq.heappush(open_set, (f, h, next(unique), neighbor))
+            if neighbor not in g_score or tentative_g < g_score[neighbor]:
                 came_from[neighbor] = current
+                g_score[neighbor] = tentative_g
 
-    if goal not in came_from and goal != start:
+                h = manhattan(neighbor, goal)
+                f = tentative_g + h
+
+                heapq.heappush(open_set, (f, neighbor))
+
+    if goal not in came_from:
         return [], steps, visited
 
     path = []
@@ -81,12 +83,11 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
 
     while current != start:
         path.append(current)
-        current = came_from.get(current)
-        if current is None:
-            return [], steps, visited
+        current = came_from[current]
 
     path.append(start)
     path.reverse()
+
     return path, steps, visited
 
 
@@ -95,6 +96,9 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
 def bfs_search(start, goal, max_cols, max_rows, blocked=None):
     if blocked is None:
         blocked = set()
+
+    if start == goal:
+        return [start], 0, [start]
 
     queue = deque([start])
     came_from = {start: None}
@@ -120,7 +124,7 @@ def bfs_search(start, goal, max_cols, max_rows, blocked=None):
                 queue.append(neighbor)
                 came_from[neighbor] = current
 
-    if goal not in came_from and goal != start:
+    if goal not in came_from:
         return [], steps, visited
 
     path = []
@@ -128,12 +132,11 @@ def bfs_search(start, goal, max_cols, max_rows, blocked=None):
 
     while current != start:
         path.append(current)
-        current = came_from.get(current)
-        if current is None:
-            return [], steps, visited
+        current = came_from[current]
 
     path.append(start)
     path.reverse()
+
     return path, steps, visited
 
 
