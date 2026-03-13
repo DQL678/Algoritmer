@@ -4,6 +4,7 @@ class GameManager:
     def __init__(self):
         self.difficulty = "hard"
         self.level = 1
+        self.creative_mode = False
 
         # Level data: step limit + max walls
         self.levels = {
@@ -28,6 +29,8 @@ class GameManager:
         return self.levels[self.level]["step_limit"]
 
     def get_wall_limit(self):
+        if self.creative_mode:
+            return 999999
         return self.levels[self.level]["walls"]
 
     def next_level(self):
@@ -38,3 +41,9 @@ class GameManager:
 
     def restart_game(self):
         self.level = 1
+
+    def set_creative_mode(self, value):
+        self.creative_mode = value
+
+    def get_creative_mode(self):
+        return self.creative_mode

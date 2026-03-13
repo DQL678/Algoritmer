@@ -1,5 +1,6 @@
 import heapq
 from collections import deque
+from itertools import count
 
 # 4-retningers grid
 def get_neighbors(pos, max_cols, max_rows):
@@ -30,17 +31,26 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
     if blocked is None:
         blocked = set()
 
+    unique = count()
+
     open_set = []
-    heapq.heappush(open_set, (0, start))
+    start_h = manhattan(start, goal)
+    heapq.heappush(open_set, (start_h, start_h, next(unique), start))
 
     came_from = {}
     cost_so_far = {start: 0}
 
     visited = []
     steps = 0
+    closed_set = set()
 
     while open_set:
-        _, current = heapq.heappop(open_set)
+        _, _, _, current = heapq.heappop(open_set)
+
+        if current in closed_set:
+            continue
+
+        closed_set.add(current)
         visited.append(current)
         steps += 1
 
@@ -51,12 +61,16 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
             if neighbor in blocked:
                 continue
 
+            if neighbor in closed_set:
+                continue
+
             new_cost = cost_so_far[current] + 1
 
             if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
                 cost_so_far[neighbor] = new_cost
-                priority = new_cost + manhattan(neighbor, goal)
-                heapq.heappush(open_set, (priority, neighbor))
+                h = manhattan(neighbor, goal)
+                f = new_cost + h
+                heapq.heappush(open_set, (f, h, next(unique), neighbor))
                 came_from[neighbor] = current
 
     if goal not in came_from and goal != start:

@@ -38,11 +38,16 @@ def open_difficulty_window():
     save_button.pack(pady=15)
 
 def start_game():
+    game_manager.set_creative_mode(False)
+    run_map(game_manager)
+
+def start_creative_mode():
+    game_manager.set_creative_mode(True)
     run_map(game_manager)
 
 root = tk.Tk()
 root.title("Main Menu")
-root.geometry("300x250")
+root.geometry("300x300")
 
 label = tk.Label(root, text="Protect the Flag", font=("Arial", 14))
 label.pack(pady=15)
@@ -52,5 +57,8 @@ difficulty_button.pack(pady=10)
 
 map_button = tk.Button(root, text="Start Game", command=start_game)
 map_button.pack(pady=10)
+
+creative_button = tk.Button(root, text="Creative Mode", command=start_creative_mode)
+creative_button.pack(pady=10)
 
 root.mainloop()

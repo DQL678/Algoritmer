@@ -57,8 +57,12 @@ def run_map(game_manager):
         level = game_manager.get_level()
         step_limit = game_manager.get_step_limit()
         wall_limit = game_manager.get_wall_limit()
+        creative_mode = game_manager.get_creative_mode()
 
-        pygame.display.set_caption(f"Protect the Flag - {difficulty.upper()} - Level {level}")
+        if creative_mode:
+            pygame.display.set_caption(f"Protect the Flag - CREATIVE MODE - {difficulty.upper()}")
+        else:
+            pygame.display.set_caption(f"Protect the Flag - {difficulty.upper()} - Level {level}")
 
         pathfinder = get_pathfinder(difficulty)
 
@@ -117,13 +121,20 @@ def run_map(game_manager):
             difficulty_text = font.render(f"Difficulty: {difficulty.upper()}", True, (255, 255, 255))
             screen.blit(difficulty_text, (WIDTH - 450, 8))
 
-            level_text = font.render(f"Level: {level}", True, (255, 255, 255))
-            screen.blit(level_text, (WIDTH - 320, 8))
+            if creative_mode:
+                mode_text = font.render("Mode: CREATIVE", True, (255, 255, 255))
+                screen.blit(mode_text, (WIDTH - 320, 8))
+            else:
+                level_text = font.render(f"Level: {level}", True, (255, 255, 255))
+                screen.blit(level_text, (WIDTH - 320, 8))
 
-            limit_text = font.render(f"Step limit: {step_limit}", True, (255, 255, 255))
-            screen.blit(limit_text, (WIDTH - 220, 8))
+                limit_text = font.render(f"Step limit: {step_limit}", True, (255, 255, 255))
+                screen.blit(limit_text, (WIDTH - 220, 8))
 
-            wall_text = font.render(f"Walls: {len(player.get_walls())}/{player.max_walls}", True, (255, 255, 255))
+            if creative_mode:
+                wall_text = font.render("Walls: Unlimited", True, (255, 255, 255))
+            else:
+                wall_text = font.render(f"Walls: {len(player.get_walls())}/{player.max_walls}", True, (255, 255, 255))
             screen.blit(wall_text, (WIDTH - 450, 32))
 
             if show_path_info:
@@ -132,11 +143,18 @@ def run_map(game_manager):
                 screen.blit(path_text, (WIDTH - 250, 32))
                 screen.blit(steps_text, (WIDTH - 120, 32))
 
-            objective_text = font.render(
-                f"Objective: make algorithm use MORE than {step_limit} search steps",
-                True,
-                (255, 255, 255)
-            )
+            if creative_mode:
+                objective_text = font.render(
+                    "Creative Mode: build as many walls as you want",
+                    True,
+                    (255, 255, 255)
+                )
+            else:
+                objective_text = font.render(
+                    f"Objective: make algorithm use MORE than {step_limit} search steps",
+                    True,
+                    (255, 255, 255)
+                )
             screen.blit(objective_text, (10, HEIGHT - 25))
 
             for row in range(ROWS):
@@ -172,7 +190,7 @@ def run_map(game_manager):
                 else:
                     show_path_info = True
 
-                    if not waiting_after_result:
+                    if not waiting_after_result and not creative_mode:
                         if search_steps > step_limit:
                             if game_manager.next_level():
                                 result_message = "LEVEL COMPLETE - click to continue"
@@ -307,54 +325,3 @@ def run_map(game_manager):
 
                             elif player.move_flag_mode:
                                 player.set_flag(clicked)
-
-                # Keybinds
-                elif event.type == pygame.KEYDOWN:
-
-                    # F: Move Flag Mode
-                    if event.key == pygame.K_f and not started and not searching:
-                        player.toggle_move_flag_mode()
-
-                    # B: Build Mode
-                    if event.key == pygame.K_b and not started and not searching:
-                        player.toggle_build_mode()
-
-                    # R: Remove Mode
-                    if event.key == pygame.K_r and not started and not searching:
-                        player.toggle_remove_mode()
-
-                    # S: Start pathfinding
-                    if event.key == pygame.K_s and player.get_flag() and not started and not searching:
-                        path, search_steps, search_tiles = pathfinder(
-                            start,
-                            player.get_flag(),
-                            COLS,
-                            ROWS,
-                            blocked=player.get_walls()
-                        )
-                        path_length = len(path)
-                        path_index = 0
-                        search_index = 0
-                        searching = True
-                        started = False
-                        show_path_info = False
-                        result_message = None
-
-                    # G: Restart game
-                    if event.key == pygame.K_g:
-                        start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
-                        player = Player()
-                        player.max_walls = wall_limit
-                        path = []
-                        search_tiles = []
-                        path_index = 0
-                        search_index = 0
-                        started = False
-                        searching = False
-                        show_path_info = False
-                        path_length = 0
-                        search_steps = 0
-                        result_message = None
-                        waiting_after_result = False
-                        dragging = False
-
