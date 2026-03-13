@@ -66,26 +66,44 @@ def run_map(game_manager):
 
         pathfinder = get_pathfinder(difficulty)
 
-        start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
-        player = Player()
-        player.max_walls = wall_limit
+        def reset_map_state():
+            start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
 
-        path = []
-        search_tiles = []
+            player = Player()
+            player.max_walls = wall_limit
 
-        path_index = 0
-        search_index = 0
+            path = []
+            search_tiles = []
 
-        started = False
-        searching = False
-        dragging = False
+            path_index = 0
+            search_index = 0
 
-        path_length = 0
-        search_steps = 0
-        show_path_info = False
+            started = False
+            searching = False
+            dragging = False
 
-        result_message = None
-        waiting_after_result = False
+            path_length = 0
+            search_steps = 0
+            show_path_info = False
+
+            result_message = None
+            waiting_after_result = False
+
+            return (
+                start, player, path, search_tiles,
+                path_index, search_index,
+                started, searching, dragging,
+                path_length, search_steps, show_path_info,
+                result_message, waiting_after_result
+            )
+
+        (
+            start, player, path, search_tiles,
+            path_index, search_index,
+            started, searching, dragging,
+            path_length, search_steps, show_path_info,
+            result_message, waiting_after_result
+        ) = reset_map_state()
 
         font = pygame.font.SysFont(None, 24)
         big_font = pygame.font.SysFont(None, 36)
@@ -218,33 +236,29 @@ def run_map(game_manager):
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.display.quit()
                     return
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = pygame.mouse.get_pos()
 
+                    # restart skal virke altid
+                    if restart_button.collidepoint((mx, my)):
+                        (
+                            start, player, path, search_tiles,
+                            path_index, search_index,
+                            started, searching, dragging,
+                            path_length, search_steps, show_path_info,
+                            result_message, waiting_after_result
+                        ) = reset_map_state()
+                        continue
+
+                    # klik efter win/lose går videre / retry
                     if waiting_after_result:
                         running = False
                         break
 
-                    elif restart_button.collidepoint((mx, my)):
-                        start = (random.randint(0, COLS - 1), random.randint(0, ROWS - 1))
-                        player = Player()
-                        player.max_walls = wall_limit
-                        path = []
-                        search_tiles = []
-                        path_index = 0
-                        search_index = 0
-                        started = False
-                        searching = False
-                        show_path_info = False
-                        path_length = 0
-                        search_steps = 0
-                        result_message = None
-                        waiting_after_result = False
-                        dragging = False
-
-                    elif start_button.collidepoint((mx, my)) and player.get_flag() and not started and not searching:
+                    if start_button.collidepoint((mx, my)) and player.get_flag() and not started and not searching:
                         path, search_steps, search_tiles = pathfinder(
                             start,
                             player.get_flag(),

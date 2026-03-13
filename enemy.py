@@ -1,6 +1,11 @@
 import heapq
 from collections import deque
 
+# hvor aggressivt A* skal søge mod målet
+# højere tal = mere direkte mod målet
+HEURISTIC_WEIGHT = 2.0
+
+
 # 4-retningers grid
 def get_neighbors(pos, max_cols, max_rows):
     col, row = pos
@@ -36,19 +41,28 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
         return [start], 0, [start]
 
     open_set = []
-    heapq.heappush(open_set, (0, start))
 
     came_from = {}
     g_score = {start: 0}
+    closed_set = set()
+
     visited = []
     steps = 0
+    counter = 0
+
+    start_h = manhattan(start, goal)
+    start_f = start_h * HEURISTIC_WEIGHT
+
+    # (f, h, counter, node)
+    heapq.heappush(open_set, (start_f, start_h, counter, start))
 
     while open_set:
-        current_f, current = heapq.heappop(open_set)
+        _, _, _, current = heapq.heappop(open_set)
 
-        if current in visited:
+        if current in closed_set:
             continue
 
+        closed_set.add(current)
         visited.append(current)
         steps += 1
 
@@ -57,11 +71,14 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
 
         neighbors = get_neighbors(current, max_cols, max_rows)
 
-        # sortér naboer så dem tættest på målet tages først
+        # naboer der er tættest på målet behandles først
         neighbors.sort(key=lambda n: manhattan(n, goal))
 
         for neighbor in neighbors:
             if neighbor in blocked:
+                continue
+
+            if neighbor in closed_set:
                 continue
 
             tentative_g = g_score[current] + 1
@@ -71,9 +88,10 @@ def a_star_search(start, goal, max_cols, max_rows, blocked=None):
                 g_score[neighbor] = tentative_g
 
                 h = manhattan(neighbor, goal)
-                f = tentative_g + h
+                f = tentative_g + (h * HEURISTIC_WEIGHT)
 
-                heapq.heappush(open_set, (f, neighbor))
+                counter += 1
+                heapq.heappush(open_set, (f, h, counter, neighbor))
 
     if goal not in came_from:
         return [], steps, visited
